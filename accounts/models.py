@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Users(User):
     username = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=11)
-    charge = models.ForeignKey("", on_delete=models.CASCADE, blank=False, null=False)
+    charge = models.PositiveBigIntegerField(blank=False, null=False)
     is_seller = models.BooleanField()
 
     def __str__(self):
@@ -32,9 +32,11 @@ class Seller(models.Model):
 
 class Order(models.Model):
     amount = models.IntegerField(blank=False, null=False)
+    is_approved = models.BooleanField(default=False)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE, blank=False, null=False)
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, blank=False, null=False)
     created_at = models.DateTimeField(auto_created=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'amount: {self.amount}, created at: {self.created_at}'
