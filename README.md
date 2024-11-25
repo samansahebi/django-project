@@ -2,7 +2,7 @@
 
 # Get Started:
 
-first of all, initialize .env file and then run below commands:
+#### first initialize .env file and then run below commands:
 
 ```
 python -m venv venv
