@@ -39,7 +39,6 @@ class ChargeUpOrder(APIView):
 class ApproveChargeUp(APIView):
     serializer_class = ApproveChargeUpSerializer
 
-    @transaction.atomic
     def post(self):
         user = self.request.user
         order = Order.objects.get(seller=user, id=self.request.data['id'])
