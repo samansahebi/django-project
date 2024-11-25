@@ -1,4 +1,4 @@
-# Django Project
+ # Django Project
 
 # Get Started:
 
