@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Order, Seller, Users
+from .models import Order, Seller, User
 from .serializers import ChargeUpOrderSerializer, ApproveChargeUpSerializer
 import logging
 from core.logging_formater import CustomFormatter
@@ -25,11 +25,11 @@ class ChargeUpOrder(APIView):
     serializer_class = ChargeUpOrderSerializer
 
     @transaction.atomic
-    def post(self):
-        serializer = self.serializer_class(data=self.request.data)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            logger.info(f'charge up order created by user: {self.request.user}')
+            logger.info(f'charge up order created by user: {request.user}')
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
             logger.error(f'charge up request canceled: {serializer.errors}')
@@ -39,13 +39,13 @@ class ChargeUpOrder(APIView):
 class ApproveChargeUp(APIView):
     serializer_class = ApproveChargeUpSerializer
 
-    def post(self):
+    def post(self, request):
         user = self.request.user
-        order = Order.objects.get(seller=user, id=self.request.data['id'])
+        order = Order.objects.get(seller=user, id=request.data['id'])
         serializer = self.serializer_class(order, data=order, partial=True)
         if serializer.is_valid():
             serializer.save()
-            logger.info(f'user approved charge up order: {user.username} -> {Users.objects.get(id=self.request.data["buyer"])} {serializer.data["amount"]}')
+            logger.info(f'user approved charge up order: {user.username} -> {User.objects.get(id=request.data["buyer"])} {serializer.data["amount"]}')
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         else:
             logger.error(serializer.errors)
@@ -55,8 +55,8 @@ class ApproveChargeUp(APIView):
 class WaitingOrders(APIView):
     serializer_class = ChargeUpOrderSerializer
 
-    def get(self):
-        user = Seller.objects.get(user_id=self.request.user.id)
+    def get(self, request):
+        user = Seller.objects.get(user_id=request.user.id)
         order = Order.objects.filter(seller=user, is_approved=False)
         serializer = self.serializer_class(order, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
