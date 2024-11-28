@@ -58,8 +58,19 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    },
 }
+
+DJANGO_ALLOW_ASYNC_UNSAFE=True
 
 ROOT_URLCONF = 'core.urls'
 
@@ -93,6 +104,9 @@ DATABASES = {
         'PASSWORD': os.environ.get('PASS'),
         'HOST': os.environ.get('HOST'),
         'PORT': os.environ.get('PORT'),
+        'TEST': {
+            'NAME': 'test'
+        }
     }
 }
 

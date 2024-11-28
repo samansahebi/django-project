@@ -1,3 +1,6 @@
+import random
+import time
+from rest_framework import exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -26,7 +29,7 @@ class ChargeUpOrder(APIView):
 
     @transaction.atomic
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={'user': request.user})
         if serializer.is_valid():
             serializer.save()
             logger.info(f'charge up order created by user: {request.user}')
@@ -39,17 +42,26 @@ class ChargeUpOrder(APIView):
 class ApproveChargeUp(APIView):
     serializer_class = ApproveChargeUpSerializer
 
+    @transaction.atomic
     def post(self, request):
-        user = self.request.user
-        order = Order.objects.get(seller=user, id=request.data['id'])
-        serializer = self.serializer_class(order, data=order, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            logger.info(f'user approved charge up order: {user.username} -> {User.objects.get(id=request.data["buyer"])} {serializer.data["amount"]}')
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-        else:
-            logger.error(serializer.errors)
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        for _ in range(5):
+            order = Order.objects.select_for_update().filter(id=request.data['id'])
+            if order.exists():
+                serializer = self.serializer_class(order.first(), data=request.data, context={'user': request.user}, partial=True)
+
+                if serializer.is_valid():
+                    serializer.save()
+                    logger.info(f'user approved charge up order: {serializer.data["amount"]}')
+                    return Response(data=serializer.data, status=status.HTTP_200_OK)
+                else:
+                    logger.error(serializer.errors)
+                    return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            else:
+                time.sleep(random.uniform(1, 5))
+                continue
+
+        raise exceptions.NotFound()
 
 
 class WaitingOrders(APIView):

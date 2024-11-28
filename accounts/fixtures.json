@@ -1,0 +1,72 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$i6vZ2vswVdkFpwU9hShK2x$1bdLvJ3Mv8JCz4j4PEfdGQLXxQIYJzkOQhpH8lTq/6c=",
+      "last_login": "2024-11-26T21:14:26.883Z",
+      "username": "saman",
+      "active": true,
+      "staff": true,
+      "admin": true
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$MXPVUAcK22uM9qHl6S39Dt$3b/qW2mQfUd6212QD0HcSKmdS1cz1m6UfMkulasixnk=",
+      "last_login": null,
+      "username": "admin",
+      "active": true,
+      "staff": true,
+      "admin": true
+    }
+  },
+  {
+    "model": "accounts.phonenumber",
+    "pk": 1,
+    "fields": {
+      "phone_number": "{'phone_number': '09308848565'}",
+      "charge": 60000,
+      "user": []
+    }
+  },
+  {
+    "model": "accounts.seller",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "credit": 940000,
+      "customers": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "accounts.order",
+    "pk": 2,
+    "fields": {
+      "created_at": null,
+      "amount": 5000,
+      "is_approved": true,
+      "phone_number": 1,
+      "seller": 1,
+      "buyer": 2,
+      "updated_at": "2024-11-26T21:42:13.236Z"
+    }
+  },
+  {
+    "model": "accounts.order",
+    "pk": 3,
+    "fields": {
+      "created_at": null,
+      "amount": 5000,
+      "is_approved": false,
+      "phone_number": 1,
+      "seller": 1,
+      "buyer": 2,
+      "updated_at": "2024-11-26T21:49:18.025Z"
+    }
+  }
+]
